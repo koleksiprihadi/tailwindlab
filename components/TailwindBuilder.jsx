@@ -1,9 +1,7 @@
-"use client"
-
 'use client'
 
 import React, { useState } from 'react';
-import { Copy, Check, Monitor, Smartphone, Tablet, Eye, Code, Link } from 'lucide-react';
+import { Copy, Check, Monitor, Smartphone, Tablet, Eye, Code } from 'lucide-react';
 
 export default function TailwindBuilder() {
   const [selectedClasses, setSelectedClasses] = useState([]);
@@ -95,6 +93,21 @@ export default function TailwindBuilder() {
       classes: 'bg-gray-800 hover:bg-gray-900 text-white p-3 rounded-full shadow-lg transition duration-300',
       content: '→'
     },
+    'Button Gradient': { 
+      element: 'button',
+      classes: 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-xl transition duration-300',
+      content: 'Get Started'
+    },
+    'Button Ghost': { 
+      element: 'button',
+      classes: 'text-gray-700 hover:bg-gray-100 font-medium py-2 px-4 rounded-lg transition duration-200',
+      content: 'Ghost Button'
+    },
+    'Button Danger': { 
+      element: 'button',
+      classes: 'bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300',
+      content: 'Delete'
+    },
     
     // Cards
     'Card Simple': { 
@@ -112,6 +125,16 @@ export default function TailwindBuilder() {
       classes: 'bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-xl p-6 text-white',
       content: 'Gradient Card'
     },
+    'Card Featured': { 
+      element: 'card',
+      classes: 'bg-white rounded-2xl shadow-2xl p-8 border-t-4 border-blue-500',
+      content: 'Featured Card'
+    },
+    'Card Glass': { 
+      element: 'card',
+      classes: 'bg-white bg-opacity-20 backdrop-blur-lg rounded-xl shadow-xl p-6 border border-white border-opacity-30',
+      content: 'Glassmorphism'
+    },
     
     // Inputs
     'Input Modern': { 
@@ -122,6 +145,28 @@ export default function TailwindBuilder() {
     'Input Search': { 
       element: 'input',
       classes: 'w-full px-4 py-2 pl-10 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500',
+      content: ''
+    },
+    'Input Underline': { 
+      element: 'input',
+      classes: 'w-full px-2 py-2 border-b-2 border-gray-300 focus:outline-none focus:border-blue-500 bg-transparent transition',
+      content: ''
+    },
+    'Input Float Label': { 
+      element: 'input',
+      classes: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+      content: ''
+    },
+    
+    // Textarea
+    'Textarea Standard': { 
+      element: 'textarea',
+      classes: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none',
+      content: ''
+    },
+    'Textarea Modern': { 
+      element: 'textarea',
+      classes: 'w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 bg-gray-50 resize-y transition',
       content: ''
     },
     
@@ -135,6 +180,16 @@ export default function TailwindBuilder() {
       element: 'badge',
       classes: 'inline-block bg-green-100 text-green-800 text-sm font-medium px-4 py-1 rounded-full border border-green-300',
       content: 'Active'
+    },
+    'Badge Dot': { 
+      element: 'badge',
+      classes: 'inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-3 py-1 rounded-full',
+      content: '● Live'
+    },
+    'Badge Outline': { 
+      element: 'badge',
+      classes: 'inline-block border-2 border-purple-500 text-purple-500 text-xs font-bold px-3 py-1 rounded',
+      content: 'PRO'
     },
     
     // Alerts
@@ -153,25 +208,45 @@ export default function TailwindBuilder() {
       classes: 'bg-blue-50 border border-blue-200 text-blue-800 p-4 rounded-lg',
       content: 'ℹ Information: Please read carefully.'
     },
+    'Alert Warning': { 
+      element: 'alert',
+      classes: 'bg-yellow-50 border-l-4 border-yellow-400 text-yellow-800 p-4 rounded',
+      content: '⚠ Warning! Check your input.'
+    },
     
-    // Text Elements
+    // Typography / Text
     'Heading Large': { 
       element: 'heading',
       classes: 'text-4xl font-bold text-gray-900 mb-4',
       content: 'Main Title'
     },
-    'Text Body': { 
-      element: 'text',
-      classes: 'text-gray-700 leading-relaxed text-base',
-      content: 'This is body text with comfortable line height and spacing.'
-    },
-    'Text Gradient': { 
+    'Heading Gradient': { 
       element: 'heading',
       classes: 'text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent',
       content: 'Gradient Text'
     },
+    'Heading Underline': { 
+      element: 'heading',
+      classes: 'text-3xl font-bold text-gray-800 border-b-4 border-blue-500 pb-2 inline-block',
+      content: 'Section Title'
+    },
+    'Text Body': { 
+      element: 'text',
+      classes: 'text-gray-700 leading-relaxed text-base',
+      content: 'This is body text with comfortable line height and spacing for better readability.'
+    },
+    'Text Lead': { 
+      element: 'text',
+      classes: 'text-xl text-gray-600 leading-relaxed font-light',
+      content: 'Large introductory paragraph text that stands out.'
+    },
+    'Text Muted': { 
+      element: 'text',
+      classes: 'text-sm text-gray-500',
+      content: 'Small muted text for secondary information.'
+    },
     
-    // Navigation
+    // Navigation / Links
     'Nav Link': { 
       element: 'link',
       classes: 'text-gray-700 hover:text-blue-500 font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition',
@@ -182,8 +257,18 @@ export default function TailwindBuilder() {
       classes: 'text-blue-500 bg-blue-50 font-medium px-4 py-2 rounded-lg',
       content: 'Active'
     },
+    'Link Underline': { 
+      element: 'link',
+      classes: 'text-blue-500 hover:text-blue-700 underline underline-offset-2 font-medium transition',
+      content: 'Learn More'
+    },
+    'Link Button': { 
+      element: 'link',
+      classes: 'inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold px-6 py-2 rounded-lg transition',
+      content: 'Get Started'
+    },
     
-    // Containers
+    // Containers / Divs
     'Container Center': { 
       element: 'div',
       classes: 'max-w-6xl mx-auto px-4 py-8',
@@ -199,8 +284,18 @@ export default function TailwindBuilder() {
       classes: 'grid grid-cols-1 md:grid-cols-3 gap-6 p-4',
       content: 'Grid Layout'
     },
+    'Hero Section': { 
+      element: 'div',
+      classes: 'bg-gradient-to-r from-blue-500 to-purple-600 text-white py-20 px-6 text-center rounded-xl',
+      content: 'Hero Content'
+    },
+    'Section': { 
+      element: 'div',
+      classes: 'bg-white rounded-xl shadow-lg p-8 mb-6',
+      content: 'Section Content'
+    },
     
-    // Image Boxes
+    // Images
     'Image Rounded': { 
       element: 'image',
       classes: 'w-full h-64 object-cover rounded-xl shadow-lg',
@@ -211,17 +306,51 @@ export default function TailwindBuilder() {
       classes: 'w-16 h-16 rounded-full border-2 border-blue-500',
       content: ''
     },
+    'Avatar Large': { 
+      element: 'image',
+      classes: 'w-32 h-32 rounded-full shadow-xl border-4 border-white',
+      content: ''
+    },
+    'Image Card': { 
+      element: 'image',
+      classes: 'w-full h-48 object-cover rounded-t-xl',
+      content: ''
+    },
     
-    // Form Elements
+    // Form Labels
     'Form Label': { 
       element: 'text',
       classes: 'block text-sm font-medium text-gray-700 mb-2',
       content: 'Input Label'
     },
-    'Textarea': { 
-      element: 'textarea',
-      classes: 'w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none',
-      content: ''
+    'Form Help Text': { 
+      element: 'text',
+      classes: 'text-xs text-gray-500 mt-1',
+      content: 'Helper text goes here'
+    },
+    
+    // Lists
+    'List Item': { 
+      element: 'list',
+      classes: 'flex items-center py-3 px-4 hover:bg-gray-50 rounded-lg transition cursor-pointer',
+      content: 'List Item Content'
+    },
+    'List Bordered': { 
+      element: 'list',
+      classes: 'border-b border-gray-200 py-3 px-2 last:border-b-0',
+      content: 'Bordered List Item'
+    },
+    
+    // Tables
+    'Table Header': { 
+      element: 'table',
+      classes: 'px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider',
+      content: 'Header'
+    },
+    'Table Cell': { 
+      element: 'table',
+      classes: 'px-6 py-4 whitespace-nowrap text-sm text-gray-900',
+      content: 'Cell Data'
     }
   };
 
@@ -333,7 +462,7 @@ export default function TailwindBuilder() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
       {/* Header */}
       <div className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-full px-4 py-4">
@@ -369,10 +498,10 @@ export default function TailwindBuilder() {
       </div>
 
       {/* Main Content - 2 Column Layout */}
-      <div className="flex flex-col lg:flex-row h-[calc(100vh-140px)]">
+      <div className="flex flex-col lg:flex-row flex-1">
         
         {/* LEFT SIDE - PREVIEW (Fixed/Sticky) */}
-        <div className="lg:w-2/5 xl:w-1/3 bg-white border-r border-gray-200 flex flex-col lg:sticky lg:top-[140px] lg:h-[calc(100vh-140px)] overflow-hidden">
+        <div className="lg:w-2/5 xl:w-1/3 bg-white border-r border-gray-200 flex flex-col lg:sticky lg:top-[88px] lg:h-[calc(100vh-88px)] overflow-hidden">
           <div className="p-4 flex-1 flex flex-col overflow-auto">
             
             {/* Code Output */}
@@ -543,13 +672,17 @@ export default function TailwindBuilder() {
                 {Object.entries({
                   'Buttons': Object.entries(componentTemplates).filter(([name]) => name.includes('Button')),
                   'Cards': Object.entries(componentTemplates).filter(([name]) => name.includes('Card')),
-                  'Inputs & Forms': Object.entries(componentTemplates).filter(([name]) => name.includes('Input') || name.includes('Textarea') || name.includes('Form')),
+                  'Inputs': Object.entries(componentTemplates).filter(([name]) => name.includes('Input')),
+                  'Textareas': Object.entries(componentTemplates).filter(([name]) => name.includes('Textarea')),
                   'Badges & Tags': Object.entries(componentTemplates).filter(([name]) => name.includes('Badge')),
                   'Alerts': Object.entries(componentTemplates).filter(([name]) => name.includes('Alert')),
-                  'Typography': Object.entries(componentTemplates).filter(([name]) => name.includes('Heading') || name.includes('Text')),
-                  'Navigation': Object.entries(componentTemplates).filter(([name]) => name.includes('Nav')),
-                  'Containers & Layout': Object.entries(componentTemplates).filter(([name]) => name.includes('Container') || name.includes('Flex') || name.includes('Grid')),
-                  'Images': Object.entries(componentTemplates).filter(([name]) => name.includes('Image') || name.includes('Avatar'))
+                  'Typography & Text': Object.entries(componentTemplates).filter(([name]) => name.includes('Heading') || name.includes('Text ')),
+                  'Navigation & Links': Object.entries(componentTemplates).filter(([name]) => name.includes('Nav') || name.includes('Link')),
+                  'Containers & Layout': Object.entries(componentTemplates).filter(([name]) => name.includes('Container') || name.includes('Flex') || name.includes('Grid') || name.includes('Hero') || name.includes('Section')),
+                  'Images & Avatars': Object.entries(componentTemplates).filter(([name]) => name.includes('Image') || name.includes('Avatar')),
+                  'Forms': Object.entries(componentTemplates).filter(([name]) => name.includes('Form')),
+                  'Lists': Object.entries(componentTemplates).filter(([name]) => name.includes('List')),
+                  'Tables': Object.entries(componentTemplates).filter(([name]) => name.includes('Table'))
                 }).map(([category, templates]) => (
                   templates.length > 0 && (
                     <div key={category} className="mb-6">
@@ -587,7 +720,6 @@ export default function TailwindBuilder() {
                           ))}
                         </div>
                       </div>
-                      
                     </div>
                   )
                 ))}
@@ -596,13 +728,23 @@ export default function TailwindBuilder() {
           </div>
         </div>
       </div>
-      <footer className="text-center p-1 text-sm text-gray-500">
-        <div>© 2024 TailwindLab. All rights reserved.</div>
-        <div className="mt-1">
-          Made with <span className="text-red-500">♥</span> by{' '}
-          <a href="https://teknomaven.com" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline font-medium">
-            TeknoMaven
-          </a>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-auto">
+        <div className="max-w-full px-4 py-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-center md:text-left">
+              <p className="text-gray-600 text-sm">
+                © 2024 <span className="font-semibold text-gray-800">TailwindLab</span>. All rights reserved.
+              </p>
+            </div>
+            <div className="text-center md:text-right">
+              <p className="text-gray-600 text-sm flex items-center justify-center md:justify-end gap-1">
+                Made with <span className="text-red-500 animate-pulse">♥</span> by{' '}
+                <span className="font-semibold text-blue-500">TeknoMaven</span>
+              </p>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
