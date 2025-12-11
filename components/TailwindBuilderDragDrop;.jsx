@@ -12,6 +12,11 @@ const TailwindBuilderDragDrop = () => {
   const [historyIndex, setHistoryIndex] = useState(0);
   const [collapsedNodes, setCollapsedNodes] = useState({});
   const [activeTab, setActiveTab] = useState('properties'); // 'properties' or 'tree'
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const [customCode, setCustomCode] = useState('');
+  const [customName, setCustomName] = useState('');
+  const [customClasses, setCustomClasses] = useState('');
+  const [tempComponents, setTempComponents] = useState([]);
   const canvasRef = useRef(null);
 
   const componentLibrary = [
@@ -405,11 +410,62 @@ const TailwindBuilderDragDrop = () => {
     }));
   };
 
+  const saveCustomComponent = () => {
+    if (!customCode.trim()) {
+      alert('Please enter some HTML code!');
+      return;
+    }
+
+    const newTempComp = {
+      id: 'temp-' + Date.now(),
+      name: customName.trim() || 'Custom Component',
+      icon: '✨',
+      type: 'custom',
+      code: customCode,
+      classes: customClasses,
+      timestamp: new Date().toISOString()
+    };
+
+    setTempComponents(prev => [...prev, newTempComp]);
+    setCustomCode('');
+    setCustomName('');
+    setCustomClasses('');
+    alert('Custom component saved! You can now drag it to canvas.');
+  };
+
+  const addCustomToCanvas = (tempComp) => {
+    const newComponent = {
+      id: generateId(),
+      type: 'custom',
+      name: tempComp.name,
+      classes: tempComp.classes,
+      content: tempComp.code,
+      allowsChildren: false
+    };
+
+    const newComponents = [...components, newComponent];
+    setComponents(newComponents);
+    addToHistory(newComponents);
+    setSelectedId(newComponent.id);
+  };
+
+  const deleteCustomComponent = (id) => {
+    setTempComponents(prev => prev.filter(c => c.id !== id));
+  };
+
   const renderTreeNode = (comp, level = 0) => {
     const isSelected = selectedId === comp.id;
     const isCollapsed = collapsedNodes[comp.id];
     const hasChildren = comp.children && comp.children.length > 0;
-    const icon = componentLibrary.find(c => c.type === comp.type)?.icon || '📦';
+    
+    // Get icon - for custom components, use ✨, otherwise get from library
+    let icon = '📦';
+    if (comp.type === 'custom') {
+      icon = '✨';
+    } else {
+      const libComp = componentLibrary.find(c => c.type === comp.type);
+      if (libComp) icon = libComp.icon;
+    }
 
     return (
       <div key={comp.id} className="select-none">
@@ -480,7 +536,12 @@ const TailwindBuilderDragDrop = () => {
     let html = '';
 
     componentsArray.forEach(comp => {
-      if (comp.type === 'input') {
+      if (comp.type === 'custom') {
+        // Handle custom components
+        html += `${indentation}<div class="${comp.classes}">\n`;
+        html += `${indentation}  ${comp.content}\n`;
+        html += `${indentation}</div>\n`;
+      } else if (comp.type === 'input') {
         html += `${indentation}<input class="${comp.classes}" placeholder="${comp.placeholder || ''}" />\n`;
       } else if (comp.type === 'image') {
         html += `${indentation}<img src="${comp.content}" class="${comp.classes}" alt="Image" />\n`;
@@ -533,6 +594,38 @@ ${html}
 
   const renderComponent = (comp, isNested = false) => {
     const isSelected = selectedId === comp.id;
+    
+    // Handle custom components differently
+    if (comp.type === 'custom') {
+      return (
+        <div
+          key={comp.id}
+          className={`relative ${comp.classes}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setSelectedId(comp.id);
+          }}
+        >
+          <div 
+            className={isSelected ? 'outline outline-4 outline-blue-500 outline-offset-2' : ''}
+            dangerouslySetInnerHTML={{ __html: comp.content }}
+          />
+          
+          {isSelected && (
+            <div className="absolute -top-10 left-0 bg-gray-900 text-white px-3 py-1 rounded text-xs font-mono flex items-center gap-2 shadow-lg z-50">
+              <span>{comp.name}</span>
+              <button onClick={(e) => { e.stopPropagation(); duplicateComponent(comp.id); }} className="hover:text-blue-400">
+                <Copy size={14} />
+              </button>
+              <button onClick={(e) => { e.stopPropagation(); deleteComponent(comp.id); }} className="hover:text-red-400">
+                <Trash2 size={14} />
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+    
     const Component = comp.type === 'input' ? 'input' : 
                      comp.type === 'image' ? 'img' :
                      comp.type === 'button' ? 'button' :
@@ -606,7 +699,7 @@ ${html}
       <header className="bg-slate-950 border-b border-slate-700 px-6 py-4 flex items-center justify-between shadow-2xl">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center font-bold text-lg shadow-lg">
+            <div className="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-lg flex items-center justify-center font-bold text-lg shadow-lg">
               <img src="https://teknomaven.com/logoputih.png" class="h-10 w-auto object-contain" alt="TeknoMaven Logo" />
             </div>
             <div>
@@ -670,6 +763,15 @@ ${html}
           </button>
 
           <button
+            onClick={() => setShowCustomModal(true)}
+            className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg font-semibold hover:from-purple-400 hover:to-pink-500 transition-all flex items-center gap-2 shadow-lg"
+            title="Create Custom Component"
+          >
+            <Plus size={18} />
+            Custom
+          </button>
+
+          <button
             onClick={exportCode}
             className="px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-lg font-semibold hover:from-cyan-400 hover:to-blue-500 transition-all flex items-center gap-2 shadow-lg"
           >
@@ -706,6 +808,45 @@ ${html}
                 </div>
               ))}
             </div>
+
+            {/* Temporary Components Section */}
+            {tempComponents.length > 0 && (
+              <div className="mt-8 pt-6 border-t border-slate-700">
+                <h2 className="text-sm font-bold text-slate-300 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  ✨ Custom Components
+                </h2>
+                <div className="space-y-2">
+                  {tempComponents.map((comp) => (
+                    <div
+                      key={comp.id}
+                      className="bg-gradient-to-br from-purple-900/50 to-pink-900/50 border border-purple-700 rounded-lg p-4 transition-all hover:border-purple-500 hover:shadow-lg hover:shadow-purple-500/20 group"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="text-2xl">{comp.icon}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-white truncate">{comp.name}</div>
+                          <div className="text-xs text-slate-400 mt-1">custom</div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => addCustomToCanvas(comp)}
+                          className="flex-1 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-semibold rounded transition-colors"
+                        >
+                          Add to Canvas
+                        </button>
+                        <button
+                          onClick={() => deleteCustomComponent(comp.id)}
+                          className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white text-xs rounded transition-colors"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </aside>
 
@@ -821,7 +962,9 @@ ${html}
                     <div>
                       <label className="block text-sm font-semibold text-slate-300 mb-2">Component</label>
                       <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 flex items-center gap-3">
-                        <span className="text-2xl">{componentLibrary.find(c => c.type === selectedComponent.type)?.icon}</span>
+                        <span className="text-2xl">
+                          {selectedComponent.type === 'custom' ? '✨' : componentLibrary.find(c => c.type === selectedComponent.type)?.icon}
+                        </span>
                         <span className="font-semibold">{selectedComponent.name}</span>
                       </div>
                     </div>
@@ -837,7 +980,18 @@ ${html}
                       <p className="text-xs text-slate-400 mt-2">Separate classes with spaces</p>
                     </div>
 
-                    {selectedComponent.type !== 'image' && selectedComponent.type !== 'input' && (
+                    {selectedComponent.type === 'custom' ? (
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-300 mb-2">HTML Content</label>
+                        <textarea
+                          value={selectedComponent.content}
+                          onChange={(e) => updateComponent(selectedComponent.id, { content: e.target.value })}
+                          className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-sm font-mono text-cyan-400 focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[200px]"
+                          placeholder="Enter HTML content..."
+                        />
+                        <p className="text-xs text-slate-400 mt-2">💡 Custom component with HTML content</p>
+                      </div>
+                    ) : selectedComponent.type !== 'image' && selectedComponent.type !== 'input' ? (
                       <div>
                         <label className="block text-sm font-semibold text-slate-300 mb-2">Content</label>
                         <textarea
@@ -847,7 +1001,7 @@ ${html}
                           placeholder="Enter content or HTML..."
                         />
                       </div>
-                    )}
+                    ) : null}
 
                     {selectedComponent.type === 'image' && (
                       <div>
@@ -941,6 +1095,142 @@ ${html}
                 <Download size={18} />
                 Export HTML
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Component Modal */}
+      {showCustomModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-8">
+          <div className="bg-slate-900 rounded-xl border border-slate-700 shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-slate-700">
+              <div>
+                <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Create Custom Component
+                </h3>
+                <p className="text-sm text-slate-400 mt-1">Paste your HTML/Tailwind code and preview it</p>
+              </div>
+              <button
+                onClick={() => setShowCustomModal(false)}
+                className="text-slate-400 hover:text-white transition-colors text-2xl"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-hidden flex">
+              {/* Left Panel - Code Editor */}
+              <div className="w-1/2 border-r border-slate-700 flex flex-col">
+                <div className="p-6 space-y-4 overflow-y-auto">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      Component Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={customName}
+                      onChange={(e) => setCustomName(e.target.value)}
+                      placeholder="e.g. Hero Section, Pricing Card..."
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      Container Classes (Optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={customClasses}
+                      onChange={(e) => setCustomClasses(e.target.value)}
+                      placeholder="e.g. p-8 bg-white rounded-xl shadow-lg"
+                      className="w-full bg-slate-800 border border-slate-700 rounded-lg p-3 text-sm font-mono text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+
+                  <div className="flex-1">
+                    <label className="block text-sm font-semibold text-slate-300 mb-2">
+                      HTML Code *
+                    </label>
+                    <textarea
+                      value={customCode}
+                      onChange={(e) => setCustomCode(e.target.value)}
+                      placeholder={`<div class="text-center">
+  <h1 class="text-4xl font-bold text-gray-900 mb-4">
+    Welcome to My Site
+  </h1>
+  <p class="text-lg text-gray-600">
+    This is a custom component
+  </p>
+  <button class="mt-6 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+    Get Started
+  </button>
+</div>`}
+                      className="w-full bg-slate-950 border border-slate-700 rounded-lg p-4 text-sm font-mono text-cyan-400 focus:outline-none focus:ring-2 focus:ring-purple-500 min-h-[400px] resize-none"
+                    />
+                    <p className="text-xs text-slate-500 mt-2">
+                      💡 Tip: Use Tailwind classes for styling. The code will be rendered with Tailwind CDN.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Panel - Preview */}
+              <div className="w-1/2 flex flex-col">
+                <div className="p-6 border-b border-slate-700">
+                  <h4 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Live Preview</h4>
+                </div>
+                <div className="flex-1 p-6 bg-slate-800 overflow-y-auto">
+                  {customCode ? (
+                    <div className="bg-white rounded-lg p-8 min-h-full">
+                      <div 
+                        className={customClasses}
+                        dangerouslySetInnerHTML={{ __html: customCode }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-center">
+                      <div>
+                        <div className="text-6xl mb-4">✨</div>
+                        <p className="text-slate-400">Your preview will appear here</p>
+                        <p className="text-sm text-slate-600 mt-2">Start typing HTML code on the left</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-slate-700 flex justify-between items-center">
+              <div className="text-sm text-slate-400">
+                <span className="font-semibold text-slate-300">{tempComponents.length}</span> custom component(s) saved
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setCustomCode('');
+                    setCustomName('');
+                    setCustomClasses('');
+                  }}
+                  className="px-6 py-2 bg-slate-800 hover:bg-slate-750 rounded-lg font-semibold transition-colors"
+                >
+                  Clear
+                </button>
+                <button
+                  onClick={() => setShowCustomModal(false)}
+                  className="px-6 py-2 bg-slate-800 hover:bg-slate-750 rounded-lg font-semibold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveCustomComponent}
+                  className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg font-semibold hover:from-purple-400 hover:to-pink-500 transition-all flex items-center gap-2 shadow-lg"
+                >
+                  <Plus size={18} />
+                  Save Component
+                </button>
+              </div>
             </div>
           </div>
         </div>
